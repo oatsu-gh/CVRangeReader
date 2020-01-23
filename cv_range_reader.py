@@ -8,7 +8,7 @@ import os
 import sys
 from datetime import date
 from pprint import pprint
-from subprocess import Popen
+# from subprocess import Popen
 
 import openpyxl
 
@@ -52,10 +52,16 @@ def make_xlsx(l, savepath):
     l       : 辞書のリスト
     savepath: ファイルを保存するパス
     """
-    # 新規ブック
-    wb = openpyxl.Workbook()
-    # 新規シート
-    sheet = wb.create_sheet()
+    try:
+        # 既存ブック
+        wb = openpyxl.load_workbook(savepath)
+        # 新規シート
+        sheet = wb.create_sheet()
+    except Exception as e:
+        # 新規ブック
+        print(e)
+        wb = openpyxl.Workbook()
+        sheet = wb.active
     sheet['A1'].value = 'bookname'
     sheet['B1'].value = 'sheetname'
     sheet['C1'].value = 'Emin'
@@ -80,9 +86,9 @@ def main():
     """
     # 読み取るファイルを指定
     print('ファイルを指定してください。')
-    filepath = input('> ')
+    filepath = input('> ').strip('"')
 
-    if not filepath.endswith('.xlsx'):
+    if not filepath.endswith(('.xlsx', '.xlsm')):
         filepath += '.xlsx'
 
     try:
@@ -99,9 +105,11 @@ def main():
     savepath = 'result(CVRangeReader).xlsx'
     make_xlsx(l, savepath)
 
-    # つくったファイルを開く
-    Popen(['start', savepath], shell=True)
+    print('できた')
 
+    # つくったファイルを開く
+    # Popen(['start', savepath], shell=True)
 
 if __name__ == '__main__':
-    main()
+    while True:
+        main()
